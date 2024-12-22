@@ -1,0 +1,379 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Neon Nexus Newspaper</title>
+    <style>
+        body {
+            font-family: "Tahoma", sans-serif;
+            background-color: #008080;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .window {
+            background-color: #f0f0f0;
+            border: 2px solid #000;
+            box-shadow: 4px 4px 0px rgba(0, 0, 0, 0.2);
+            width: 400px;
+            border-radius: 4px;
+            position: absolute;
+            overflow: hidden;
+            z-index: 2;
+            transition: transform 0.3s ease, opacity 0.3s ease;
+        }
+
+        .window.hidden {
+            transform: scale(0.8);
+            opacity: 0;
+        }
+
+        .title-bar {
+            background: linear-gradient(to bottom, #000080, #0000cd);
+            color: white;
+            font-size: 14px;
+            padding: 4px 8px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .title-bar .title {
+            font-weight: bold;
+        }
+
+        .title-bar .buttons {
+            display: flex;
+            gap: 4px;
+        }
+
+        .button {
+            width: 16px;
+            height: 16px;
+            border: 1px solid black;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 12px;
+            font-weight: bold;
+            cursor: pointer;
+            border-radius: 2px;
+        }
+
+        .button.close {
+            background-color: #ff0000;
+        }
+
+        .content {
+            text-align: center;
+            padding: 20px;
+        }
+
+        .logo {
+            font-family: 'Press Start 2P', cursive;
+            color: #000080;
+            margin: 0;
+        }
+
+        .logo span {
+            display: block;
+        }
+
+        .logo .title {
+            font-size: 32px;
+            text-shadow: 2px 2px #ffffff, -2px -2px #808080;
+        }
+
+        .logo .subtitle {
+            font-size: 20px;
+            text-shadow: 1px 1px #ffffff, -1px -1px #808080;
+        }
+
+        .news-window {
+            text-align: center;
+            font-family: 'Press Start 2P', cursive;
+            color: #000;
+            background-color: #ffffff;
+            border: 2px solid #000;
+            width: 600px;
+            height: 400px;
+            box-shadow: 4px 4px 0px rgba(0, 0, 0, 0.2);
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 1;
+            display: flex;
+            flex-direction: column;
+            opacity: 0.5;
+            filter: blur(3px);
+            pointer-events: none;
+            transition: opacity 0.5s ease, filter 0.5s ease;
+        }
+
+        .news-window.visible {
+            opacity: 1;
+            filter: blur(0);
+            pointer-events: auto;
+        }
+
+        .news-window .title-bar {
+            background: linear-gradient(to bottom, #000080, #0000cd);
+            color: white;
+            font-size: 14px;
+            padding: 4px 8px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .news-window .content {
+            padding: 20px;
+            flex-grow: 1;
+            overflow-y: auto;
+        }
+
+        .news-window .content p {
+            position: relative;
+            color: red;
+            animation: glitch 1s infinite;
+        }
+
+        .news-window.visible .content p {
+            animation: none;
+            color: black;
+            transition: color 0.5s ease;
+        }
+
+        @keyframes glitch {
+            0% {
+                text-shadow: 2px 0 blue, -2px 0 green;
+            }
+            33% {
+                text-shadow: -2px -2px blue, 2px 2px green;
+            }
+            66% {
+                text-shadow: 2px 2px blue, -2px -2px green;
+            }
+            100% {
+                text-shadow: -2px 0 blue, 2px 0 green;
+            }
+        }
+
+        @import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
+
+        .popup-window {
+            position: absolute;
+            background-color: #f0f0f0;
+            border: 2px solid #000;
+            box-shadow: 4px 4px 0px rgba(0, 0, 0, 0.2);
+            width: 300px;
+            overflow: hidden;
+            z-index: 4;
+            display: flex;
+            flex-direction: column;
+            animation: popupAppear 0.5s ease;
+            cursor: move;
+        }
+
+        @keyframes popupAppear {
+            from {
+                transform: scale(0.8);
+                opacity: 0;
+            }
+            to {
+                transform: scale(1);
+                opacity: 1;
+            }
+        }
+
+        .popup-window .title-bar {
+            background: linear-gradient(to bottom, #000080, #0000cd);
+            color: white;
+            font-size: 14px;
+            padding: 4px 8px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .popup-window .content {
+            padding: 10px;
+            font-family: 'Press Start 2P', cursive;
+            font-size: 12px;
+            color: #000;
+            text-align: center;
+        }
+
+        .popup-window .button {
+            background-color: #ff0000;
+            color: white;
+            font-size: 12px;
+            border: none;
+            cursor: pointer;
+            width: 20px;
+            height: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .popup-window .button:hover {
+            filter: brightness(85%);
+        }
+
+        .popup-window .claim-button {
+            background-color: #008000;
+            color: white;
+            font-size: 14px;
+            border: none;
+            cursor: pointer;
+            padding: 8px 16px;
+            margin-top: 10px;
+            border-radius: 4px;
+        }
+
+        .popup-window .claim-button:hover {
+            filter: brightness(85%);
+        }
+
+        .language-switch {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            display: flex;
+            gap: 10px;
+        }
+
+        .language-switch img {
+            width: 32px;
+            height: 32px;
+            cursor: pointer;
+        }
+
+    </style>
+    <script>
+        function closeWindow() {
+            const windowElement = document.querySelector('.window');
+            const newsWindow = document.querySelector('.news-window');
+            windowElement.classList.add('hidden');
+            setTimeout(() => {
+                windowElement.style.display = 'none';
+                newsWindow.classList.add('visible');
+            }, 300);
+        }
+
+        function createPopup(content) {
+            const popup = document.createElement('div');
+            popup.className = 'popup-window';
+
+            const randomLink = Math.random() < 0.5
+                ? 'https://gamejolt.com/games/infection/956099'
+                : 'https://nn-team.itch.io/neon-nexus-infection-demo';
+
+            popup.innerHTML = `
+            <div class="title-bar">
+                <span>¡Nuevo Premio!</span>
+                <button class="button close" onclick="this.parentElement.parentElement.remove()">X</button>
+            </div>
+            <div class="content">
+                <p>Has ganado un Yphone o un Max Peluche</p>
+                <button class="claim-button" onclick="window.location.href='${randomLink}'">Reclamar</button>
+            </div>
+            `;
+
+            document.body.appendChild(popup);
+
+            // Position the popup randomly within the visible window
+            const x = Math.random() * (window.innerWidth - 300);
+            const y = Math.random() * (window.innerHeight - 150);
+            popup.style.left = `${x}px`;
+            popup.style.top = `${y}px`;
+
+            // Make the popup draggable
+            makeDraggable(popup);
+        }
+
+        function makeDraggable(element) {
+            let offsetX = 0, offsetY = 0, startX = 0, startY = 0;
+
+            const titleBar = element.querySelector('.title-bar');
+            titleBar.onmousedown = (e) => {
+                startX = e.clientX;
+                startY = e.clientY;
+
+                document.onmousemove = drag;
+                document.onmouseup = () => {
+                    document.onmousemove = null;
+                    document.onmouseup = null;
+                };
+            };
+
+            function drag(e) {
+                offsetX = e.clientX - startX;
+                offsetY = e.clientY - startY;
+
+                const rect = element.getBoundingClientRect();
+                element.style.left = `${rect.left + offsetX}px`;
+                element.style.top = `${rect.top + offsetY}px`;
+
+                startX = e.clientX;
+                startY = e.clientY;
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            // Logo animation
+            const logo = document.querySelector('.logo');
+            let scale = 1, growing = true;
+
+            setInterval(() => {
+                scale += growing ? 0.01 : -0.01;
+                if (scale >= 1.2) growing = false;
+                if (scale <= 1) growing = true;
+                logo.style.transform = `scale(${scale})`;
+            }, 16);
+
+            // Create random popups
+            setInterval(() => createPopup(), 5000);
+        });
+    </script>
+</head>
+<body>
+    <div class="language-switch">
+        <img src="path_to_spanish_flag.png" alt="Español" onclick="switchLanguage('es')">
+        <img src="path_to_english_flag.png" alt="English" onclick="switchLanguage('en')">
+    </div>
+    <div class="window">
+        <div class="title-bar">
+            <span class="title">NEON NEXUS</span>
+            <div class="buttons">
+                <button class="button close" onclick="closeWindow()">X</button>
+            </div>
+        </div>
+        <div class="content">
+            <h1 class="logo">
+                <span class="title">NEON NEXUS</span>
+                <span class="subtitle">NEWSPAPER</span>
+            </h1>
+        </div>
+    </div>
+    <div class="news-window">
+        <div class="title-bar">
+            <span>Noticias</span>
+        </div>
+        <div class="content">
+            <h2>NEON NEXUS INFECTION DEMO</h2>
+            <p>La nueva demo de Neon Nexus. En esta se agregaron cosas como la selección de personaje y el mundo top-down. 
+               En esta demo solo hay 3 niveles para jugar, ¡descúbrela ahora!</p>
+        </div>
+    </div>
+</body>
+</html>
